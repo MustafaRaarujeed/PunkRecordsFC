@@ -170,6 +170,7 @@ across both backtested seasons it out-ranks the model:
 | `ppg_horizon` | That baseline over the same fixtures as `xp_horizon` |
 | `xp_edge` | `xp_horizon - ppg_horizon` — where the model departs from the record |
 | `stale` | 1 if the player's last PL season is not the most recent one |
+| `new_club` | 1 if he joined after the last season ended — his minutes record is from a different club |
 
 **`xp_edge` is the column to read when deciding whether to trust a projection.**
 Near zero means model and record agree, so the number is well supported. A large
@@ -203,14 +204,25 @@ both show edges near −5 for exactly this reason, not for any footballing one.
 3. **Penalties are only implicit.** A player's xG includes penalties they took
    last season. A *new* penalty taker is invisible to the model. Check
    `penalties_order` in `bootstrap-static` manually.
-4. **Role changes are invisible.** A defender moved to midfield, a winger moved
+4. **A transferred player's record is his OLD club's record.** Anyone flagged
+   `new_club=1` joined after the last season ended, so every minute, goal and
+   defensive action in their history was earned somewhere else. The model gets
+   two of three things right — team context uses the new club, and personal
+   per-90 rates travel with the player — but `p_start` does not. Starting 34
+   games at a mid-table side says little about starting for a title contender.
+   Preseason this hits 11 highly-rated players, several of whom the optimiser
+   wants. `project.py` names them on every run. Their xP is **not** discounted,
+   because the right discount depends on squad depth at the destination;
+   treat it as a minutes question and get evidence, exactly as for promoted
+   clubs.
+5. **Role changes are invisible.** A defender moved to midfield, a winger moved
    central, a new manager's system — the model sees only last season's output.
-5. **DefCon is miscalibrated in both directions.** Measured on 2025/26: where
+6. **DefCon is miscalibrated in both directions.** Measured on 2025/26: where
    the model predicts under 10%, players actually hit 10.6%; where it predicts
    81%, they hit 54%. Defensive-action counts are overdispersed and Poisson
    cannot represent that. Treat DefCon projections near the threshold as soft,
    and distrust the very confident ones most.
-6. **Bonus is understated for dribblers**, because the 2026/27 BPS change
+7. **Bonus is understated for dribblers**, because the 2026/27 BPS change
    removed the dispossessed-in-a-tackle penalty and the model trains on last
    season's bonus rates.
 

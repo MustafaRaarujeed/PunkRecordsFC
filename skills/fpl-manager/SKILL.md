@@ -101,6 +101,12 @@ Preseason every current-season stat is zero, so the model runs on last season's
   data is years old, and if it predates 2025/26 their DefCon scores zero
   because the stat did not exist. Run `python scripts/project.py --disagree 10`
   and check both tails before trusting any large `xp_edge`.
+- **Transferred players carry their old club's minutes.** `new_club=1` means
+  they joined after last season ended, so `p_start` comes from a different
+  team's squad depth. `project.py` names the highly-rated ones on every run.
+  The API's club assignment is authoritative — do not "verify" it, there is
+  nothing to check. The open question is whether he *starts*, which is a
+  minutes assumption needing evidence, same as a promoted-club player.
 - **Promoted clubs are invisible.** 97% of Coventry, Hull and Ipswich players
   cannot be modelled. They are not worthless — measured across two promoted
   cohorts they return 47–100% of an established club's points per minute — but

@@ -246,6 +246,21 @@ def load_assumptions() -> dict:
     return out
 
 
+# A player who joined after the last completed season ended has NO record at
+# his current club: every minute, goal and defensive action in history_past was
+# earned elsewhere. Team context (fixtures, clean-sheet odds) correctly uses the
+# new club, and his personal per-90 rates travel with him -- but p_start does
+# not. Starting 34 games at a mid-table side says little about starting for a
+# title contender. Preseason this affects a large share of the highest-rated
+# players, so it is flagged rather than silently trusted.
+NEW_CLUB_CUTOFF = "2026-06-01"
+
+
+def joined_new_club(element: dict, cutoff: str = NEW_CLUB_CUTOFF) -> bool:
+    joined = element.get("team_join_date")
+    return bool(joined and joined >= cutoff)
+
+
 def stale_source(src: str, newest_season: str) -> bool:
     """True when a player's most recent PL season is not the latest one."""
     return bool(src.startswith("history:") and newest_season
@@ -374,6 +389,7 @@ def project_player(element, summary, ratings, baselines, fixtures_by_team, gws,
     # so dc90 is 0 and the DefCon term silently vanishes, under-projecting
     # defenders in particular. Never trust these without a manual look.
     stale = int(stale_source(src, newest_season))
+    new_club = int(joined_new_club(element))
 
     return {
         "assumed": assumed,
@@ -388,6 +404,7 @@ def project_player(element, summary, ratings, baselines, fixtures_by_team, gws,
         "source": src,
         "no_history": int(no_history),
         "stale": stale,
+        "new_club": new_club,
         "avail": round(avail, 2),
         "p_start": round(p_start, 3),
         "xmins": round(xmins, 1),
@@ -539,7 +556,7 @@ def main() -> int:
 
     with (DATA / "projections.csv").open("w", newline="") as handle:
         cols = ["id", "name", "team", "pos", "price", "status", "no_history", "avail",
-                "p_start", "xmins", "dc90", "stale", "assumed", "fixtures",
+                "p_start", "xmins", "dc90", "stale", "new_club", "assumed", "fixtures",
                 "xp_next", "xp_horizon",
                 "xp_per_m", "ppg", "ppg_horizon", "xp_edge",
                 "selected_by", "source", "news"]
@@ -564,6 +581,16 @@ def main() -> int:
         print(f"  {used} players projected from ASSUMED minutes "
               f"(state/minutes-assumptions.json) -- replacement-level rates, "
               f"not observed ones")
+    movers = [r for r in rows if r["new_club"] and r["xp_horizon"] > 15]
+    if movers:
+        movers.sort(key=lambda r: -r["xp_horizon"])
+        print(f"  {len(movers)} highly-rated players joined a new club since "
+              f"{NEW_CLUB_CUTOFF} -- their minutes record is from their OLD club:")
+        for row in movers[:6]:
+            print(f"    {row['name'][:16]:<17}{row['team']:<5}"
+                  f"xP {row['xp_horizon']:>5.1f}  xmins {row['xmins']:>3.0f}")
+        if len(movers) > 6:
+            print(f"    ... and {len(movers) - 6} more (new_club=1 in the CSV)")
     stale = sum(r["stale"] for r in rows if not r["no_history"])
     if stale:
         print(f"  {stale} more have STALE history (last played the PL before "

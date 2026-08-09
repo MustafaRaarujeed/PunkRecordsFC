@@ -73,7 +73,11 @@ else is stdlib, so a broken install never blocks a data refresh.
 - **The model does not beat a naive baseline.** Points-per-game out-ranks it in
   both backtested seasons. `projections.csv` carries `ppg_horizon` and `xp_edge`
   alongside every projection for exactly that reason — treat xP as one input.
-- **203 of 572 players cannot be modelled** preseason (promoted clubs, new
+- **Transferred players carry their old club's minutes record.** Flagged
+  `new_club=1`; `project.py` names the highly-rated ones. The club assignment
+  itself is authoritative — the question is whether he starts, not where he
+  plays.
+- **204 of 573 players cannot be modelled** preseason (promoted clubs, new
   signings), plus 24 with stale history. They are flagged `no_history` and
   `stale`. The optimiser cannot see them unless a human asserts minutes in
   `state/minutes-assumptions.json`, and even then only with `--allow-assumed`.
