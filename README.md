@@ -430,9 +430,9 @@ Built 2026-08-07, before GW1.
 - [x] Backtesting against 2025/26, with 2024/25 as an untouched holdout —
       4 real problems found and fixed
 - [x] Model documentation (`docs/model-explained.md`)
-- [x] Telegram deadline reminder via GitHub Actions — tested locally
+- [x] Telegram deadline reminder via GitHub Actions — secrets set, workflow
+      verified end to end
 - [x] FPL account created and `.env` filled in
-- [ ] Telegram secrets added to GitHub Actions, workflow verified
 - [ ] GW1 squad drafted and entered
 - [ ] Re-validate in-season: the `strength_attack/defence` branch has never run
       on live data (those fields are zero preseason)
