@@ -1,0 +1,22 @@
+# Credentials -- never commit. FPL session cookies belong to your account.
+.env
+
+# API cache, fully reproducible via scripts/fetch.py
+data/
+
+# Personal prompt cheat-sheet: contains the local project path, and the
+# workflow it describes is already documented in README.md.
+PROMPTS.md
+
+# Live squad state: holds bank, purchase and selling prices -- your financial
+# position, which is not public even though your picks effectively are.
+# state/chip-plan.md, priors.md and log/ ARE tracked: that is the reasoning
+# history, and it is the point of the project.
+state/squad.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+.DS_Store

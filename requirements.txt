@@ -1,0 +1,3 @@
+# fetch.py, project.py and validate.py are stdlib-only and need none of this.
+# Only the optimiser pulls in a dependency.
+pulp==2.9.0

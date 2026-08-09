@@ -1,0 +1,53 @@
+name: FPL deadline reminder
+
+# Sends a Telegram message when an FPL deadline is approaching.
+#
+# Needs no FPL credentials -- deadlines are public. The only secrets are the
+# Telegram bot token and chat id. Set them at:
+#   Settings -> Secrets and variables -> Actions -> New repository secret
+#     TELEGRAM_BOT_TOKEN   from @BotFather
+#     TELEGRAM_CHAT_ID     from https://api.telegram.org/bot<TOKEN>/getUpdates
+#
+# scripts/notify.py decides whether to send: it alerts on the LOCK session (the
+# last civil Sydney evening to act), not the raw deadline, because 26 of 38
+# deadlines land overnight in Sydney. Outside the window it exits quietly, so
+# running often is cheap and harmless.
+
+on:
+  schedule:
+    # Times are UTC. Sydney is UTC+10 (AEST) or UTC+11 (AEDT).
+    #   07:00 UTC = 17:00 AEST / 18:00 AEDT -- catches a lock the same evening
+    #   21:00 UTC = 07:00 AEST / 08:00 AEDT -- next-morning heads-up
+    - cron: "0 7 * * *"
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Send even outside the alert window"
+        type: boolean
+        default: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No pip install: notify.py and fpl_common are stdlib only.
+      - name: Send reminder if a deadline is close
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Optional; adds a copy-pasteable cd to the message.
+          FPL_PROJECT_DIR: ${{ secrets.FPL_PROJECT_DIR }}
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            python3 scripts/notify.py --force
+          else
+            python3 scripts/notify.py
+          fi
