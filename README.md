@@ -171,6 +171,8 @@ price rise.
 | `deadlines.py` | Deadlines in Sydney time, with lock sessions | stdlib |
 | `odds.py` | Per-fixture expected goals from bookmaker prices | stdlib + key |
 | `project.py` | Expected points per player per gameweek | stdlib |
+| `export_xlsx.py` | Human-readable workbook from projection outputs | stdlib |
+| `gw_review_graph.py` | Projected-vs-actual XI graph from a decision log | stdlib |
 | `backtest.py` | Replays the model over a finished season | stdlib |
 | `fetch_history.sh` | Downloads historical season data | curl |
 | `optimise.py` | Picks the squad by integer program | `.venv` (pulp) |
@@ -187,6 +189,8 @@ Flags worth knowing:
 python3 scripts/project.py --top 30            # leaderboard
 python3 scripts/project.py --disagree 10       # where the model departs from the baseline
 python3 scripts/project.py --needs-assumption 3  # players the model cannot see, by club
+python3 scripts/export_xlsx.py                 # writes data/projections.xlsx
+python3 scripts/gw_review_graph.py --gw 1      # writes state/log/gw1-review.svg
 .venv/bin/python scripts/optimise.py --draft --lock Haaland --exclude Salah
 .venv/bin/python scripts/optimise.py --xi      # best XI from the current squad
 python3 scripts/backtest.py --season 2024-25 --sweep-blend   # holdout
