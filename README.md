@@ -35,7 +35,7 @@ a hallucination.
 git clone <this repo> && cd PunkRecordsFC
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env      # then fill it in — see Credentials below
-./install.sh              # installs the skill and agent into ~/.claude
+./install.sh              # installs for Codex (preferred), or another agent
 ```
 
 Verify:
@@ -149,15 +149,17 @@ python3 scripts/fetch.py --core --force     # prices move overnight
 python3 scripts/validate.py --all
 ```
 
-Or just ask Claude — the `fpl-manager` skill drives all of the above:
+Or ask an LLM agent to use the `fpl-manager` skill. **Codex is the preferred
+agent for this project**, but the skill and scripts are not tied to a specific
+model:
 
 ```
-/fpl-manager plan     # Tue/Wed, reconnaissance
-/fpl-manager lock     # the evening before the deadline, the one that matters
-/fpl-manager review   # after the gameweek settles
+$fpl-manager plan     # Tue/Wed, reconnaissance
+$fpl-manager lock     # the evening before the deadline, the one that matters
+$fpl-manager review   # after the gameweek settles
 ```
 
-`/fpl-manager draft` builds the initial 15. Add `--reserve 5` thinking if the
+`$fpl-manager draft` builds the initial 15. Add `--reserve 5` thinking if the
 draft is days early — a squad spent to exactly £0.0m cannot absorb an overnight
 price rise.
 
@@ -230,8 +232,16 @@ Bank is deliberately excluded from the records so they stay committable.
 
 ## The skill and the agent
 
-`install.sh` copies two things into `~/.claude`, substituting `{{PROJECT_ROOT}}`
-for this directory's absolute path:
+`install.sh` copies two things into the agent configuration directory,
+substituting `{{PROJECT_ROOT}}` for this directory's absolute path. It uses an
+explicit directory argument first, then `AGENT_CONFIG_DIR`, then `CODEX_HOME`,
+and otherwise defaults to `~/.codex`:
+
+```bash
+./install.sh                         # Codex (preferred) default
+AGENT_CONFIG_DIR=~/.other-agent ./install.sh
+./install.sh ~/.other-agent         # explicit destination
+```
 
 - **`fpl-manager` skill** — four modes: `draft` (initial 15), `plan`
   (early-week), `lock` (pre-deadline), `review` (post-gameweek).

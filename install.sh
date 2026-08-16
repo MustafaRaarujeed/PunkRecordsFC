@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Install the fpl-manager skill and fpl-scout agent into a Claude config dir.
+# Install the fpl-manager skill and fpl-scout agent into an agent config dir.
 #
 # Usage:
-#   ./install.sh              # -> ~/.claude
-#   ./install.sh ~/.agents    # -> somewhere else
+#   ./install.sh                    # -> $AGENT_CONFIG_DIR, $CODEX_HOME, or ~/.codex
+#   ./install.sh ~/.other-agent     # -> an explicit agent config directory
 #
 # Only SKILL.md, its references, and the agent are copied. scripts/, state/ and
 # data/ stay here and are referenced by absolute path: state/squad.json is the
@@ -14,7 +14,8 @@
 
 set -euo pipefail
 
-TARGET_DIR="${1:-$HOME/.claude}"
+DEFAULT_TARGET_DIR="${AGENT_CONFIG_DIR:-${CODEX_HOME:-$HOME/.codex}}"
+TARGET_DIR="${1:-$DEFAULT_TARGET_DIR}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SKILL_NAME="fpl-manager"

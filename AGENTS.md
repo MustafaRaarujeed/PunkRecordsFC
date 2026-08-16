@@ -25,9 +25,9 @@ Any other agent, or a `draft` run, still needs the user's say-so.
 The user may keep a local, untracked `PROMPTS.md` of copy-paste prompts. Do not
 recreate or track it — it holds their local path, and this repo is public.
 
-The skill and agent are **copies** installed into `~/.claude` by `./install.sh`.
-Edit the originals under `skills/` and `agents/`, then rerun `./install.sh` —
-editing the installed copy does nothing.
+The skill and agent are **copies** installed into the configured agent directory
+by `./install.sh`. Edit the originals under `skills/` and `agents/`, then rerun
+`./install.sh` — editing the installed copy does nothing.
 
 ## Layout
 
