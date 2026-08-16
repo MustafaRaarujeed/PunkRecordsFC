@@ -298,7 +298,8 @@ def fixture_points(
     dc_shape: float = DC_SHAPE,
     form_blend: float = FORM_BLEND,
     avail: float = 1.0,
-) -> float:
+    components: bool = False,
+) -> float | dict[str, float]:
     """Expected FPL points for one player in one fixture.
 
     `rates` holds per-90 rates: xg90, xa90, dc90, sv90, bonus90, yellow90.
@@ -306,27 +307,35 @@ def fixture_points(
     player's own team baseline -- see projection-model.md on double counting.
     """
     mins_share = xmins / 90.0
-    pts = 2 * p_start + 1 * max(0.0, p_appear - p_start)
-    pts += rates.get("xg90", 0.0) * mins_share * fixture_mult * GOAL_PTS[pos]
-    pts += rates.get("xa90", 0.0) * mins_share * fixture_mult * ASSIST_PTS
+    parts = {
+        "appearance": 2 * p_start + 1 * max(0.0, p_appear - p_start),
+        "goals": rates.get("xg90", 0.0) * mins_share * fixture_mult * GOAL_PTS[pos],
+        "assists": rates.get("xa90", 0.0) * mins_share * fixture_mult * ASSIST_PTS,
+        "clean_sheet": 0.0,
+        "concede_penalty": 0.0,
+        "saves": 0.0,
+        "defcon": 0.0,
+        "bonus": rates.get("bonus90", 0.0) * mins_share,
+        "cards": -rates.get("yellow90", 0.0) * mins_share,
+    }
 
     if CS_PTS[pos]:
         # A clean sheet needs 60 minutes, hence p_start rather than p_appear.
-        pts += math.exp(-xg_against) * CS_PTS[pos] * p_start
+        parts["clean_sheet"] = math.exp(-xg_against) * CS_PTS[pos] * p_start
     if pos in CONCEDE_POS:
-        pts += expected_concede_penalty(xg_against) * p_start
+        parts["concede_penalty"] = expected_concede_penalty(xg_against) * p_start
     if pos == "GKP":
-        pts += rates.get("sv90", 0.0) * mins_share * (xg_against / LEAGUE_AVG_GOALS) / 3.0
+        parts["saves"] = rates.get("sv90", 0.0) * mins_share * (xg_against / LEAGUE_AVG_GOALS) / 3.0
     if pos in DC_THRESHOLD:
         lam = rates.get("dc90", 0.0) * mins_share
         if dc_shape > 0:
             p_hit = nbinom_at_least(DC_THRESHOLD[pos], lam, dc_shape)
         else:
             p_hit = poisson_at_least(DC_THRESHOLD[pos], lam) * dc_dispersion
-        pts += p_hit * DC_PTS
+        parts["defcon"] = p_hit * DC_PTS
 
-    pts += rates.get("bonus90", 0.0) * mins_share
-    pts -= rates.get("yellow90", 0.0) * mins_share
+    structural = sum(parts.values())
+    pts = structural
 
     # Shrink toward what this player actually scores per appearance. The
     # structural model above reconstructs points from components and drifts;
@@ -336,9 +345,20 @@ def fixture_points(
     # probability. p_appear is derived from historical starts and is noisy
     # enough that multiplying by it measurably degrades ranking.
     ppg = rates.get("ppg")
+    observed = 0.0
+    structural_weight = 1.0
     if ppg is not None and form_blend > 0:
-        pts = (1 - form_blend) * pts + form_blend * ppg * avail
-    return pts
+        structural_weight = 1 - form_blend
+        observed = form_blend * ppg * avail
+        pts = structural_weight * pts + observed
+    if not components:
+        return pts
+
+    weighted = {key: value * structural_weight for key, value in parts.items()}
+    weighted["observed"] = observed
+    weighted["structural"] = structural
+    weighted["total"] = pts
+    return weighted
 
 
 def fmt_price(tenths) -> str:

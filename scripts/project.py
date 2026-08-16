@@ -350,9 +350,24 @@ def project_player(element, summary, ratings, baselines, fixtures_by_team, gws,
     base_xg = baselines.get(team_id, LEAGUE_AVG_GOALS)
 
     per_gw: dict[int, float] = {}
+    per_gw_components: dict[int, dict[str, float]] = {}
+    component_totals = {
+        "appearance": 0.0,
+        "goals": 0.0,
+        "assists": 0.0,
+        "clean_sheet": 0.0,
+        "concede_penalty": 0.0,
+        "saves": 0.0,
+        "defcon": 0.0,
+        "bonus": 0.0,
+        "cards": 0.0,
+        "observed": 0.0,
+        "structural": 0.0,
+    }
     fixture_count = 0
     for gw in gws:
         total = 0.0
+        gw_components = dict.fromkeys(component_totals, 0.0)
         for fixture in fixtures_by_team.get(team_id, {}).get(gw, []):
             fixture_count += 1
             is_home = fixture["team_h"] == team_id
@@ -362,13 +377,20 @@ def project_player(element, summary, ratings, baselines, fixtures_by_team, gws,
             else:
                 xg_h, xg_a = fixture_goals(ratings, fixture["team_h"], fixture["team_a"])
             xg_for, xg_against = (xg_h, xg_a) if is_home else (xg_a, xg_h)
-            total += fixture_points(
+            parts = fixture_points(
                 pos, rates, xmins, p_start, p_appear,
                 xg_for, xg_against, safe_div(xg_for, base_xg, 1.0),
-                avail=avail)
+                avail=avail, components=True)
+            total += parts["total"]
+            for key in gw_components:
+                gw_components[key] += parts[key]
         per_gw[gw] = round(total, 3)
+        per_gw_components[gw] = {key: round(value, 3) for key, value in gw_components.items()}
+        for key, value in gw_components.items():
+            component_totals[key] += value
 
     horizon = round(sum(per_gw.values()), 3)
+    component_totals = {key: round(value, 3) for key, value in component_totals.items()}
 
     # The naive baseline, carried alongside the projection on purpose. Across
     # both backtested seasons it out-ranks the model by 0.04-0.06 rho, so it is
@@ -390,6 +412,13 @@ def project_player(element, summary, ratings, baselines, fixtures_by_team, gws,
     # defenders in particular. Never trust these without a manual look.
     stale = int(stale_source(src, newest_season))
     new_club = int(joined_new_club(element))
+    xp_component_sum = round(
+        sum(component_totals[key] for key in (
+            "appearance", "goals", "assists", "clean_sheet", "concede_penalty",
+            "saves", "defcon", "bonus", "cards", "observed"
+        )),
+        3,
+    )
 
     return {
         "assumed": assumed,
@@ -410,9 +439,23 @@ def project_player(element, summary, ratings, baselines, fixtures_by_team, gws,
         "xmins": round(xmins, 1),
         "dc90": round(rates["dc90"], 2),
         "per_gw": per_gw,
+        "components": component_totals,
+        "per_gw_components": per_gw_components,
         "fixtures": fixture_count,
         "xp_horizon": horizon,
         "xp_next": per_gw.get(min(gws), 0.0) if gws else 0.0,
+        "xp_appearance": component_totals["appearance"],
+        "xp_goals": component_totals["goals"],
+        "xp_assists": component_totals["assists"],
+        "xp_clean_sheet": component_totals["clean_sheet"],
+        "xp_concede_penalty": component_totals["concede_penalty"],
+        "xp_saves": component_totals["saves"],
+        "xp_defcon": component_totals["defcon"],
+        "xp_bonus": component_totals["bonus"],
+        "xp_cards": component_totals["cards"],
+        "xp_observed": component_totals["observed"],
+        "xp_structural": component_totals["structural"],
+        "xp_component_sum": xp_component_sum,
         "xp_per_m": round(safe_div(horizon, element["now_cost"] / 10.0), 3),
         "ppg": round(ppg, 3),
         "ppg_horizon": ppg_horizon,
@@ -558,6 +601,9 @@ def main() -> int:
         cols = ["id", "name", "team", "pos", "price", "status", "no_history", "avail",
                 "p_start", "xmins", "dc90", "stale", "new_club", "assumed", "fixtures",
                 "xp_next", "xp_horizon",
+                "xp_appearance", "xp_goals", "xp_assists", "xp_clean_sheet",
+                "xp_concede_penalty", "xp_saves", "xp_defcon", "xp_bonus",
+                "xp_cards", "xp_observed", "xp_structural", "xp_component_sum",
                 "xp_per_m", "ppg", "ppg_horizon", "xp_edge",
                 "selected_by", "source", "news"]
         writer = csv.DictWriter(handle, fieldnames=cols, extrasaction="ignore")
