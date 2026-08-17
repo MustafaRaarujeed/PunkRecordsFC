@@ -29,8 +29,13 @@ advice, which is worse than no advice.
    (`--lock`, `--exclude`, or a documented xP adjustment) and rerun it — do not
    hand-edit the result. An unexplained swap is indistinguishable from a
    hallucination.
-5. **Run `scripts/validate.py --all` before showing any squad.** An illegal
-   squad wastes the user's deadline.
+5. **Run validation before showing any squad.** For `plan`, `lock`, `review`
+   and any post-sync squad, run `scripts/validate.py --all`; an illegal squad
+   wastes the user's deadline. The only exception is a pre-GW1 `draft` preview
+   before the human has entered the squad on FPL: `state/squad.json` does not
+   exist yet, so run `scripts/validate.py --rules` and rely on
+   `optimise.py`'s legality check. Once the human enters and syncs the draft,
+   `validate.py --all` applies again.
 6. **Re-read prices at lock time** with `fetch.py --core --force`, and confirm
    it says "fetching", not "cache hit". Prices change overnight; a plan built on
    Tuesday's prices may be unaffordable on Friday.
@@ -82,6 +87,11 @@ python scripts/odds.py                        # sharper fixture difficulty
 python scripts/project.py --horizon 6
 .venv/bin/python scripts/optimise.py --draft
 ```
+
+Before the human enters this squad on FPL, there may be no `state/squad.json`.
+That is expected for a scratch GW1 draft. Do not block the draft card on
+`validate.py --all` failing the squad-state check; run `validate.py --rules`
+and report that full validation applies after the entered squad is synced.
 
 Consider `--reserve 5` (hold £0.5m back) if the draft is days before the
 deadline — a squad spent to £0.0m cannot absorb an overnight price rise.
