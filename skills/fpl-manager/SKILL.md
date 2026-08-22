@@ -48,6 +48,13 @@ advice, which is worse than no advice.
    to. What it cannot write is *why*: copy `state/log/TEMPLATE.md` to
    `state/log/gw{N}.md` and fill it in, including what you rejected and what
    would make you wrong. `validate.py --log` reports gameweeks missing either.
+10. **Export public pages only when requested.** For plan/lock/draft runs where
+    the user wants the public dashboard, export it after validation and after
+    `state/log/gw{N}.md` is written. If a repo-local exporter exists, use it.
+    If the exporter lives outside this repo, ask the user for the path before
+    generating the report. The export must read only public-safe model outputs
+    and decision logs; never publish `.env`, `state/squad.json`,
+    `data/my-team.json`, or raw private state.
 
 ## Timing — this is a Sydney problem
 
@@ -171,6 +178,11 @@ Produce a *provisional* card plus an explicit list of what would change it
 yet. The point of this pass is to know what you are looking for before team
 news lands.
 
+If a public dashboard snapshot is part of the run, write/update
+`state/log/gw{N}.md`, then use the configured dashboard exporter. If no exporter
+is configured or discoverable in the repo, ask the user where it lives before
+generating the report.
+
 ### lock — the final pass (the evening before the deadline)
 
 1. Refetch: `python scripts/fetch.py --core --force` (prices move).
@@ -188,6 +200,10 @@ news lands.
 5. Emit the final instruction card, format per `references/output-format.md`.
 6. Write `state/log/gw{N}.md` from `state/log/TEMPLATE.md`. The matching
    `-decision.json` is already there; this is the half only you can write.
+7. If publishing the public snapshot, use the repo-local exporter if present,
+   or ask the user for the external exporter path if it is not. Include the
+   local page path in the response. This is not a substitute for the short
+   instruction card.
 
 ### review — after the gameweek settles
 

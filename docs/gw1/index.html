@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GW1 Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>:root {
+  color-scheme: light;
+  --color-primary: #C17B5C;
+  --color-dark: #1E2830;
+  --color-slate: #6B7B80;
+  --color-muted: #8A9A9F;
+  --color-light: #E8E0D4;
+}
+[data-theme="light"] {
+  --bg: var(--color-light);
+  --bg-alt: #F5F0E8;
+  --surface: #FDFAF6;
+  --surface-2: #F0EAE0;
+  --text: var(--color-dark);
+  --text-2: var(--color-slate);
+  --text-3: var(--color-muted);
+  --border: #D4C8B8;
+  --border-strong: #B8AA97;
+  --accent: var(--color-primary);
+  --accent-dim: rgba(193, 123, 92, 0.10);
+  --rule: rgba(30, 40, 48, 0.08);
+  --shadow: 0 2px 16px rgba(30, 40, 48, 0.10);
+  --shadow-lg: 0 8px 40px rgba(30, 40, 48, 0.15);
+}
+[data-theme="dark"] {
+  --bg: #131B22;
+  --bg-alt: #1A2430;
+  --surface: #1E2830;
+  --surface-2: #243038;
+  --text: var(--color-light);
+  --text-2: var(--color-muted);
+  --text-3: var(--color-slate);
+  --border: #2C3A42;
+  --border-strong: #3D4E57;
+  --accent: var(--color-primary);
+  --accent-dim: rgba(193, 123, 92, 0.13);
+  --rule: rgba(232, 224, 212, 0.06);
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.50);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Crimson Pro", Georgia, serif;
+  font-size: 18px;
+  line-height: 1.7;
+  transition: background 0.35s ease, color 0.35s ease;
+  overflow-x: hidden;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem clamp(1rem, 4vw, 2rem);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(18px);
+}
+.masthead-brand, .masthead-tag, .theme-toggle, .section-label, .stat-label, .stat-desc, .category-tag, .meta-key, .sidebar-heading, .signals-header, .footer-badge {
+  font-family: "DM Mono", monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.masthead-brand { font-size: 0.72rem; color: var(--text-2); }
+.masthead-brand span { color: var(--accent); }
+.masthead-right { display: flex; gap: 0.75rem; align-items: center; }
+.masthead-tag { color: var(--text-3); font-size: 0.62rem; }
+.theme-toggle {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+  font-size: 0.62rem;
+}
+.hero {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2rem) 1.5rem;
+}
+.hero-kicker, .hero-byline { font-family: "DM Mono", monospace; color: var(--accent); font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.page-backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.45rem 0.65rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.page-backlink:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.hero-title {
+  max-width: 820px;
+  margin: 0.35rem 0 0.55rem;
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+.hero-lede { max-width: 720px; color: var(--text-2); font-size: 1.18rem; font-weight: 300; }
+.stats-strip { border-block: 1px solid var(--rule); background: var(--bg-alt); }
+.stats-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+.stat-cell { padding: 1.15rem clamp(1rem, 3vw, 1.5rem); border-right: 1px solid var(--rule); }
+.stat-cell:last-child { border-right: 0; }
+.stat-label, .stat-desc { color: var(--text-3); font-size: 0.62rem; }
+.stat-value { font-family: "DM Serif Display", serif; font-size: 2rem; line-height: 1; color: var(--text); margin: 0.3rem 0; }
+.layout { max-width: 1180px; margin: 0 auto; padding: 2rem clamp(1rem, 4vw, 2rem); display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 1.5rem; }
+.layout.single { grid-template-columns: 1fr; }
+.main-col { min-width: 0; }
+.sidebar { display: grid; gap: 1rem; align-content: start; }
+.sidebar-block, .category-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  position: relative;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.section-label, .sidebar-heading { color: var(--accent); font-size: 0.68rem; margin-bottom: 0.75rem; }
+.categories { display: grid; gap: 1rem; }
+.category-card { color: var(--text); }
+.category-card:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent-dim));
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.category-card::before { content: attr(data-index); position: absolute; right: 1rem; top: 0.35rem; font-family: "DM Serif Display", serif; font-size: 3.5rem; color: var(--text); opacity: 0.045; line-height: 1; }
+.category-tag { color: var(--text-3); font-size: 0.62rem; margin-bottom: 0.4rem; }
+.category-name { font-family: "DM Serif Display", serif; font-size: 1.55rem; line-height: 1.2; margin-bottom: 0.35rem; }
+.category-desc { color: var(--text-2); margin-bottom: 0.8rem; }
+.date-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.85rem; }
+.date-point { border: 1px solid var(--border); background: var(--surface); padding: 0.75rem; }
+.date-label { display: block; font-family: "DM Mono", monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.2rem; }
+.date-value { display: block; color: var(--text); line-height: 1.25; }
+.talk-list { list-style: none; display: grid; gap: 0.55rem; }
+.talk-item { display: flex; gap: 0.55rem; align-items: flex-start; }
+.talk-bullet { color: var(--accent); font-family: "DM Mono", monospace; }
+.talk-speaker { color: var(--text-3); font-family: "DM Mono", monospace; font-size: 0.68rem; margin-top: 0.1rem; }
+.meta-row { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--rule); padding: 0.5rem 0; }
+.meta-key { color: var(--text-3); font-size: 0.58rem; }
+.meta-val { color: var(--text-2); text-align: right; }
+.concepts-cloud { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.concept-chip, .badge {
+  display: inline-block;
+  border: 1px solid var(--border);
+  background: var(--accent-dim);
+  color: var(--text);
+  padding: 0.15rem 0.45rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+}
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+th, td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: middle; }
+th { font-family: "DM Mono", monospace; color: var(--text-3); font-size: 0.62rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.10em; white-space: nowrap; background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+.squad-table tbody tr { transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease; }
+.squad-table tbody tr:hover { background: var(--accent-dim); box-shadow: inset 3px 0 0 var(--accent); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.favorite-row td { background: var(--accent-dim); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); font-weight: 600; }
+.nav { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 1rem 0 1.25rem; }
+.nav a { background: var(--surface); border: 1px solid var(--border); padding: 0.4rem 0.6rem; font-family: "DM Mono", monospace; font-size: 0.68rem; color: var(--text-2); }
+.nav a[aria-current="page"] { color: var(--text); border-color: var(--accent); }
+.xg-bar { height: 0.55rem; overflow: hidden; background: var(--surface-2); min-width: 90px; }
+.xg-fill { display: block; height: 100%; background: var(--text-3); }
+.favorite-row .xg-fill { background: var(--accent); }
+.signals-section { background: var(--color-dark); color: var(--color-light); padding: 2rem clamp(1rem, 4vw, 2rem); }
+.signals-inner { max-width: 1180px; margin: 0 auto; }
+.signals-header { color: var(--color-primary); font-size: 0.68rem; margin-bottom: 0.35rem; }
+.signals-title { font-family: "DM Serif Display", serif; font-size: 1.8rem; margin-bottom: 1rem; }
+.signal-item { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; border-top: 1px solid rgba(232, 224, 212, 0.16); padding-top: 0.8rem; }
+.signal-num { font-family: "DM Mono", monospace; color: var(--color-primary); }
+.signal-text { color: rgba(232, 224, 212, 0.82); }
+footer { padding: 1.25rem clamp(1rem, 4vw, 2rem); border-top: 1px solid var(--rule); color: var(--text-3); font-size: 0.8rem; }
+.footer-inner { max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+.footer-badge { border: 1px solid var(--border); padding: 0.2rem 0.45rem; font-size: 0.62rem; }
+@media (max-width: 760px) {
+  .layout, .stats-inner { grid-template-columns: 1fr; }
+  .stat-cell { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .stat-cell:last-child { border-bottom: 0; }
+  table { font-size: 13px; }
+  th, td { padding: 7px 6px; }
+}</style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-brand"><span>PRFC</span> — Punk Records FC</div>
+    <div class="masthead-right">
+      <span class="masthead-tag">Gameweek Dashboard</span>
+      <button class="theme-toggle" id="themeToggle" type="button">Dark</button>
+    </div>
+  </header>
+  
+<section class="hero">
+  <div class="hero-kicker">Public snapshot</div>
+  <h1 class="hero-title">GW1 Dashboard</h1>
+  <div class="hero-byline">Deadline Sat 22 Aug 03:30 AEST</div>
+  <a class="page-backlink" href="../index.html">Back to all gameweeks</a>
+  
+<div class="date-range">
+  <div class="date-point"><span class="date-label">Starts</span><span class="date-value">Sat 22 Aug 2026, 05:00 AEST</span></div>
+  <div class="date-point"><span class="date-label">Finishes</span><span class="date-value">Tue 25 Aug 2026, 05:00 AEST</span></div>
+</div>
+
+
+</section>
+<section class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-cell"><div class="stat-label">Status</div><div class="stat-value">Final</div><div class="stat-desc">Published lock snapshot</div></div>
+    <div class="stat-cell"><div class="stat-label">Odds</div><div class="stat-value">13</div><div class="stat-desc">Priced fixtures</div></div>
+    <div class="stat-cell"><div class="stat-label">Fixtures</div><div class="stat-value">10</div><div class="stat-desc">GW1 matches</div></div>
+  </div>
+</section>
+<div class="layout single">
+  <main class="main-col">
+    <div class="section-label">Pages</div>
+    <div class="categories">
+      <a class="category-card" data-index="01" href="card.html"><div class="category-tag">Instruction</div><h2 class="category-name">Card</h2><p class="category-desc">Final squad, XI, captain, bench and chip.</p></a>
+      <a class="category-card" data-index="02" href="odds-dashboard.html"><div class="category-tag">Fixtures</div><h2 class="category-name">Odds Dashboard</h2><p class="category-desc">Priced fixtures and implied goals for this gameweek.</p></a>
+    </div>
+  </main>
+</div>
+<section class="signals-section">
+  <div class="signals-inner">
+    <div class="signals-header">Decision Notes</div>
+    <h2 class="signals-title">What matters in this GW1 snapshot</h2>
+    
+    <div class="signal-item"><div class="signal-num">01</div><div class="signal-text"><strong>Final draft, not transfers.</strong> GW1 squad changes were unlimited before the first deadline, so the optimiser ran from scratch rather than treating the auto-pick squad as a transfer baseline.</div></div>
+    <div class="signal-item"><div class="signal-num">02</div><div class="signal-text"><strong>Manual input was explicit.</strong> Dubravka, Kusi-Asare, Scarlett, Neave and Guehi were excluded after team-news/minutes checks, and Beto was locked to avoid a dead no-history bench forward.</div></div>
+    <div class="signal-item"><div class="signal-num">03</div><div class="signal-text"><strong>Main model caveat.</strong> Preseason fallback is still active, and Anderson/Senesi carry new-club minutes risk because their projection inherits old-club minutes history.</div></div>
+
+  </div>
+</section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>Generated Sat 22 Aug 2026, 12:14 AEST from public Punk Records FC model outputs. Source: <a class="footer-source-link" href="https://github.com/MustafaRaarujeed/PunkRecordsFC" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+      <div class="footer-badge">Catalogue</div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      const html = document.documentElement;
+      const toggle = document.getElementById("themeToggle");
+      const saved = localStorage.getItem("kaizoku-theme");
+      if (saved) html.setAttribute("data-theme", saved);
+      updateLabel();
+      toggle.addEventListener("click", () => {
+        const next = html.getAttribute("data-theme") === "light" ? "dark" : "light";
+        html.setAttribute("data-theme", next);
+        localStorage.setItem("kaizoku-theme", next);
+        updateLabel();
+      });
+      function updateLabel() {
+        toggle.textContent = html.getAttribute("data-theme") === "dark" ? "Light" : "Dark";
+      }
+    })();
+  </script>
+</body>
+</html>
