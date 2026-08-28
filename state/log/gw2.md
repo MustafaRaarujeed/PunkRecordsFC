@@ -1,6 +1,6 @@
-# GW2 — plan
+# GW2 — lock
 
-_Deadline Sat 29 Aug 03:30 AEST · planned Fri 28 Aug 22:12 AEST_
+_Deadline Sat 29 Aug 03:30 AEST · locked Fri 28 Aug 22:31 AEST_
 
 `gw2-decision.json` alongside this file holds the numbers — squad, xP,
 baseline, transfer gain. **This file is for what the numbers cannot record: why.**
@@ -8,7 +8,6 @@ baseline, transfer gain. **This file is for what the numbers cannot record: why.
 ## Decision
 
 ## GW2 — Punk Records FC
-**PROVISIONAL — do not act yet**
 **Deadline** Sat 29 Aug 03:30 AEST · **act by** Fri 28 Aug 21:00 AEST
 
 ### Transfers (1 free, no hit)
@@ -42,8 +41,7 @@ baseline, transfer gain. **This file is for what the numbers cannot record: why.
 ### Chip
 None. First-half chips are unused; Bench Boost still needs a double and must be used by GW19.
 
-### Watching
-- This is after the planned lock-session time; rerun lock workflow before acting if possible.
+### If team news changes
 - Senesi minutes risk: Van de Ven and Porro are back in the Spurs squad.
 - Anderson is reported fully fit after cramp; City role volatility remains.
 - João Pedro's cup rest is positive for GW2 availability.
@@ -74,13 +72,13 @@ None. First-half chips are unused; Bench Boost still needs a double and must be 
 - Senesi started GW1, but Van de Ven's return raises rotation risk.
 - João Pedro has no fresh injury concern found; cup rest is a positive availability signal.
 - B.Fernandes, Tarkowski, Beto, Verbruggen, O'Shea, and Hughes had no new actionable item found beyond FPL status/public watchlists.
-- This plan was rerun after the planned lock-session time.
+- This lock was run after the planned lock-session time.
 - Preseason fallback is still active for fixture strength where odds do not cover the horizon.
 
 ## What would make me wrong
 
 - Senesi loses his place and Tarkowski to Guehi becomes a genuine minutes/security upgrade before the deadline.
-- Late team news flags B.Fernandes, Gabriel, Anderson, João Pedro, or another starter after this plan.
+- Unexpected late team news flags B.Fernandes, Gabriel, Anderson, João Pedro, or another starter after this lock.
 - A price move blocks the preferred lock transfer path; bank is £0.0m and Anderson has already fallen to £6.4.
 - The preseason fallback materially misprices the GW2 defensive fixtures.
 

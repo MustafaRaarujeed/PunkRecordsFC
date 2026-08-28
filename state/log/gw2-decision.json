@@ -1,6 +1,6 @@
 {
  "gameweek": 2,
- "written": "2026-08-28T12:18:21+00:00",
+ "written": "2026-08-28T12:32:53+00:00",
  "mode": "transfer",
  "objective": "xp_next",
  "horizon": [
@@ -258,9 +258,9 @@
    "team": "EVE",
    "pos": "FWD",
    "price": 55,
-   "xp": 2.395,
+   "xp": 2.394,
    "ppg_horizon": 13.519,
-   "xp_edge": -1.143,
+   "xp_edge": -1.144,
    "starter": false,
    "captain": false,
    "incoming": false,
@@ -277,11 +277,11 @@
    "name": "Tarkowski"
   }
  ],
- "hold_xp": 53.094,
+ "hold_xp": 53.095,
  "move_xp": 53.525,
  "transfers": 1,
  "hits_paid": 0,
- "net_gain": 0.431,
+ "net_gain": 0.43,
  "min_gain": 1.5,
  "recommendation": "hold"
 }
