@@ -96,7 +96,8 @@ def resolve(players: list[dict], names: list[str]) -> set[int]:
 
 
 def build(players, objective_key, budget, current=None, max_transfers=None,
-          free_transfers=1, lock=(), exclude=(), bank=0, allow_assumed=False):
+          free_transfers=1, lock=(), exclude=(), start=(), bank=0,
+          allow_assumed=False):
     """Shared squad/XI/captain model. `current` switches it into transfer mode."""
     prob = pulp.LpProblem("fpl", pulp.LpMaximize)
     idx = {p["id"]: p for p in players}
@@ -157,10 +158,17 @@ def build(players, objective_key, budget, current=None, max_transfers=None,
         prob += squad[i] == 1
     for i in resolve(players, list(exclude)):
         prob += squad[i] == 0
+    for i in resolve(players, list(start)):
+        prob += xi[i] == 1
 
-    # Unavailable players are worth zero and would only waste a slot.
+    # Unavailable players are worth zero and would only waste a slot.  The
+    # hold baseline must still be able to represent the squad exactly as it
+    # stands; otherwise owning one unavailable player makes the baseline
+    # infeasible and prevents transfer gain from being calculated at all.
+    held_ids = {p["id"] for p in current["picks"]} if current else set()
+    baseline_hold = current is not None and max_transfers == 0
     for i in ids:
-        if idx[i]["avail"] <= 0:
+        if idx[i]["avail"] <= 0 and not (baseline_hold and i in held_ids):
             prob += squad[i] == 0
 
     # Players projected from asserted minutes are excluded unless explicitly
@@ -300,7 +308,7 @@ def xi_total(players, starters, captain, key) -> float:
     return total + idx[captain][key] if captain in idx else total
 
 
-def report(chosen, starters, captain, objective_key, current=None):
+def report(chosen, starters, captain, objective_key, current=None, budget=BUDGET):
     order = {"GKP": 0, "DEF": 1, "MID": 2, "FWD": 3}
     chosen.sort(key=lambda p: (order[p["pos"]], -p[objective_key]))
     held = {p["id"] for p in current["picks"]} if current else set()
@@ -328,8 +336,8 @@ def report(chosen, starters, captain, objective_key, current=None):
             total_xp += player[objective_key]
 
     cap_player = next(p for p in chosen if p["id"] == captain)
-    print(f"\n  squad cost   {fmt_price(total_price)}m of {fmt_price(BUDGET)}m"
-          f"  (bank {fmt_price(BUDGET - total_price)}m)")
+    print(f"\n  squad cost   {fmt_price(total_price)}m of {fmt_price(budget)}m"
+          f"  (bank {fmt_price(budget - total_price)}m)")
     print(f"  XI projected {total_xp + cap_player[objective_key]:.1f} pts "
           f"(captain {cap_player['name']} doubled)")
     if current:
@@ -358,6 +366,8 @@ def main() -> int:
                              "overnight price moves before the deadline")
     parser.add_argument("--lock", action="append", default=[], help="force a player in")
     parser.add_argument("--exclude", action="append", default=[], help="force a player out")
+    parser.add_argument("--start", action="append", default=[],
+                        help="force a player into the starting XI")
     args = parser.parse_args()
 
     players, meta = load_projections()
@@ -376,9 +386,9 @@ def main() -> int:
     if args.draft:
         chosen, starters, captain = build(
             players, key, args.budget, lock=args.lock, exclude=args.exclude,
-            allow_assumed=args.allow_assumed)
+            start=args.start, allow_assumed=args.allow_assumed)
         assert_legal(chosen, starters, captain, args.budget)
-        report(chosen, starters, captain, key)
+        report(chosen, starters, captain, key, budget=args.budget)
         record_decision("draft", meta, chosen, starters, captain, key, args)
         return 0
 
@@ -392,9 +402,10 @@ def main() -> int:
             return 1
         chosen, starters, captain = build(
             subset, key, args.budget, lock=args.lock, exclude=args.exclude,
+            start=args.start,
             allow_assumed=True)  # already in the squad; do not silently drop
         assert_legal(chosen, starters, captain, args.budget)
-        report(chosen, starters, captain, key)
+        report(chosen, starters, captain, key, budget=args.budget)
         record_decision("xi", meta, chosen, starters, captain, key, args,
                         current=squad)
         return 0
@@ -418,11 +429,16 @@ def main() -> int:
     print(f"  bank {fmt_price(squad.get('bank', 0))}m, {free} free transfer(s)")
 
     common = dict(current=squad, free_transfers=free, bank=squad.get("bank", 0),
-                  lock=args.lock, exclude=args.exclude,
+                  lock=args.lock, exclude=args.exclude, start=args.start,
                   allow_assumed=args.allow_assumed)
     # Baseline: what the squad scores if we do nothing. Every proposal is judged
     # against holding, not against zero.
-    _, hold_xi, hold_cap = build(players, key, args.budget, max_transfers=0, **common)
+    # Locks/exclusions describe the proposed move, not the counterfactual hold.
+    # Passing them into the baseline can either distort it or make it
+    # infeasible (for example when an owned minutes risk is excluded).
+    baseline = dict(common, lock=(), exclude=(), start=(), allow_assumed=True)
+    _, hold_xi, hold_cap = build(
+        players, key, args.budget, max_transfers=0, **baseline)
     hold_xp = xi_total(players, hold_xi, hold_cap, key)
 
     chosen, starters, captain = build(
@@ -435,7 +451,7 @@ def main() -> int:
     gain = move_xp - hold_xp - paid * HIT_COST
 
     assert_legal(chosen, starters, captain, args.budget)
-    report(chosen, starters, captain, key, current=squad)
+    report(chosen, starters, captain, key, current=squad, budget=args.budget)
     print(f"\n  hold          {hold_xp:.2f} xP")
     print(f"  {n_moves} transfer(s)  {move_xp:.2f} xP"
           + (f"  (-{paid * HIT_COST} hit)" if paid else ""))
