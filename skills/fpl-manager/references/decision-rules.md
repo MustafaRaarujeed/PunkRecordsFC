@@ -102,8 +102,11 @@ cannot see:
 
 ## What to do when the model and your judgement disagree
 
-Adjust the input and rerun. `--lock`, `--exclude`, or a documented xP adjustment
-capped at ±15%. Never hand-edit the optimiser's output — an unexplained swap is
+Adjust the input and rerun. Use `--lock` to force a player into the 15,
+`--start` to force a player into the starting XI, `--exclude` to force a player
+out of the proposal, or a documented xP adjustment capped at ±15%. These
+constraints affect the proposed squad, not the counterfactual hold baseline.
+Never hand-edit the optimiser's output — an unexplained swap is
 indistinguishable from a hallucination, both to the user and to you next week.
 
 Write the disagreement and its outcome into `state/log/gw{N}.md`. Over a season

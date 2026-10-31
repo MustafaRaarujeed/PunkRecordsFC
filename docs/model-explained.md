@@ -362,6 +362,25 @@ These live in `optimise.py` and encode how aggressively to act. They are
 *preferences*, not estimates, and cannot be validated by backtesting the way xP
 can.
 
+### Explicit constraints and the hold baseline
+
+The optimiser accepts three auditable ways to constrain a rerun:
+
+- `--lock Haaland` forces a player into the 15-player squad
+- `--start Haaland` forces a player into the starting XI
+- `--exclude Salah` forces a player out of the proposed squad
+
+They constrain the proposal only. In transfer mode, the comparison baseline is
+always the squad as it currently stands; locks, starts and exclusions are not
+allowed to rewrite the counterfactual. An owned unavailable player therefore
+remains in the hold baseline at zero xP. Without that exception, the baseline
+would be infeasible precisely when a transfer is most necessary, and the model
+could not calculate the gain from replacing him.
+
+The cost summary uses the budget supplied to that optimiser run. Its displayed
+bank is `budget - squad cost`, not an assumed £100.0m; this matters for squads
+whose live selling value has fallen.
+
 ### `MIN_GAIN = 1.5`
 
 Minimum net xP gain before recommending a transfer at all.

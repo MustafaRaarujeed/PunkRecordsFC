@@ -26,9 +26,9 @@ advice, which is worse than no advice.
    spawn it without asking. Everything else still needs the user's say-so.
 4. **Never pick the squad yourself.** `scripts/optimise.py` picks it. You supply
    inputs and audit outputs. If you disagree with the optimiser, change an input
-   (`--lock`, `--exclude`, or a documented xP adjustment) and rerun it — do not
-   hand-edit the result. An unexplained swap is indistinguishable from a
-   hallucination.
+   (`--lock` for the 15, `--start` for the XI, `--exclude`, or a documented xP
+   adjustment) and rerun it — do not hand-edit the result. An unexplained swap
+   is indistinguishable from a hallucination.
 5. **Run validation before showing any squad.** For `plan`, `lock`, `review`
    and any post-sync squad, run `scripts/validate.py --all`; an illegal squad
    wastes the user's deadline. The only exception is a pre-GW1 `draft` preview

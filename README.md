@@ -193,9 +193,16 @@ python3 scripts/export_xlsx.py                 # writes data/projections.xlsx
 python3 scripts/gw_review_graph.py --gw 1      # writes state/log/gw1-review.svg
 .venv/bin/python scripts/optimise.py --draft --lock Haaland --exclude Salah
 .venv/bin/python scripts/optimise.py --xi      # best XI from the current squad
+.venv/bin/python scripts/optimise.py --xi --start Haaland  # force him into the XI
 python3 scripts/backtest.py --season 2024-25 --sweep-blend   # holdout
 .venv/bin/python scripts/optimise.py --draft --reserve 5      # hold 0.5m back
 ```
+
+`--lock` forces a player into the 15, `--start` forces a player into the
+starting XI, and `--exclude` forces a player out of the proposed squad. These
+constraints apply to the proposal only: the transfer-mode hold baseline always
+represents the current squad as it stands, including unavailable players at
+zero xP. Reported bank is measured against the budget supplied to the run.
 
 `--top`, `--disagree` and `--needs-assumption` reuse the cached projections
 rather than regenerating them, so a reporting run cannot silently change the
